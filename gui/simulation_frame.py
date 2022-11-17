@@ -45,8 +45,8 @@ class SimulationFrame:
         button_stop = ttk.Button(options_frame, text='Stop', command=self._button_stop_command)
         button_stop.pack(side='left')
 
-        self.var_simulation_speed = tk.IntVar(value=0)
-        scale_simulation_speed = ttk.Scale(options_frame, orient='horizontal', from_=-2, to=14,
+        self.var_simulation_speed = tk.IntVar(value=3)
+        scale_simulation_speed = ttk.Scale(options_frame, orient='horizontal', from_=1, to=18,
                                            variable=self.var_simulation_speed, command=self._update_simulation_speed)
         scale_simulation_speed.pack(side='left')
 

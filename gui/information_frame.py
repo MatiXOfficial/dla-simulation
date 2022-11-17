@@ -10,9 +10,10 @@ if TYPE_CHECKING:
 
 class InformationFrame:
     def __init__(self, main_window: 'MainWindow'):
-        frame = ttk.Frame(main_window.root, relief='groove', borderwidth=3)
+        # frame = ttk.Frame(main_window.root, relief='groove', borderwidth=3)
+        frame = ttk.Frame(main_window.root)
 
-        self.statistics_frame = StatisticsFrame(main_window)
+        self.statistics_frame = StatisticsFrame(main_window, frame)
         self.config_frame = ConfigFrame(main_window, frame)
 
         frame.pack(side='left', expand=True, fill='both')

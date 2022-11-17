@@ -3,34 +3,30 @@ import random
 import numpy as np
 from matplotlib import pyplot as plt
 
+from config import Config, InitType
+
 
 class DLAImage:
-    def __init__(self, image_size, n_particles, init_method='middle'):
-        self.image_size = image_size
-        self.n_particles = n_particles
-        self.init_method = init_method
+    def __init__(self, config: Config):
+        self.config = config
 
         self.grid: set = None
         self.grid_len: int = None
         self.particles: np.ndarray = None
 
-        self.init()
-
     def init(self):
         self.grid = set()
-        if self.init_method == 'middle':
+        if self.config.init_type == InitType.MIDDLE:
             self.initialize_middle()
-        else:
-            raise ValueError(f'Init method {self.init_method} does not exist')
 
         self.grid_len = len(self.grid)
         self.particles = np.array([self._random_position()])
 
     def initialize_middle(self):
-        self.grid.add((self.image_size // 2, self.image_size // 2))
+        self.grid.add((self.config.canvas_size // 2, self.config.canvas_size // 2))
 
     def simulation_step(self):
-        if self.grid_len >= self.n_particles:
+        if self.grid_len >= self.config.image_target_size:
             self.particles = np.array([])
         for i, particle in enumerate(self.particles):
             move = self._random_move()
@@ -47,11 +43,11 @@ class DLAImage:
                 self.particles[i] = new_position
 
     def simulate(self):
-        while self.grid_len < self.n_particles:
+        while self.grid_len < self.config.image_target_size:
             self.simulation_step()
 
     def generate_image(self):
-        image = np.zeros((self.image_size, self.image_size))
+        image = np.zeros((self.config.canvas_size, self.config.canvas_size))
         for x, y in self.grid:
             image[x][y] = 2
         for x, y in self.particles:
@@ -60,7 +56,7 @@ class DLAImage:
 
     def _random_position(self):
         while True:
-            pos = np.random.randint(low=0, high=self.image_size, size=2)
+            pos = np.random.randint(low=0, high=self.config.canvas_size, size=2)
             pos = (pos[0], pos[1])
             if pos not in self.grid:
                 return pos
@@ -70,7 +66,7 @@ class DLAImage:
         return random.choice([(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)])
 
     def _is_valid_pos(self, pos):
-        return 0 <= pos[0] < self.image_size and 0 <= pos[1] < self.image_size
+        return 0 <= pos[0] < self.config.canvas_size and 0 <= pos[1] < self.config.canvas_size
 
     def print(self):
         margin = 0.12
@@ -79,17 +75,17 @@ class DLAImage:
         fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
         array = np.array(list(self.grid)).astype(np.float32)
         array += 0.5
-        marker_size = (subplot_fraction * 3 * 72 / self.image_size) ** 2
+        marker_size = (subplot_fraction * 3 * 72 / self.config.canvas_size) ** 2
         plt.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
         array = np.array(list(self.particles)).astype(np.float32)
         array += 0.5
         plt.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-        plt.xlim(0, self.image_size)
-        plt.ylim(0, self.image_size)
+        plt.xlim(0, self.config.canvas_size)
+        plt.ylim(0, self.config.canvas_size)
         ax = plt.gca()
         ax.set_aspect('equal')
-        ax.set_xticks(np.arange(0, self.image_size, 1))
-        ax.set_yticks(np.arange(0, self.image_size, 1))
+        ax.set_xticks(np.arange(0, self.config.canvas_size, 1))
+        ax.set_yticks(np.arange(0, self.config.canvas_size, 1))
         plt.grid()
         plt.show()
 
@@ -97,12 +93,19 @@ class DLAImage:
         return self.grid_len
 
     def get_target_size(self):
-        return self.n_particles
+        return self.config.image_target_size
 
 
 if __name__ == '__main__':
-    image = DLAImage(10, 10)
+    config = Config()
+    config.canvas_size = 10
+    config.image_target_size = 10
+
+    image = DLAImage(config)
+    image.init()
+
     image.simulate()
+
     print(len(image.grid))
     print(image.generate_image())
 

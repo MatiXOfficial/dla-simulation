@@ -6,10 +6,10 @@ if TYPE_CHECKING:
 
 
 class StatisticsFrame:
-    def __init__(self, main_window: 'MainWindow'):
+    def __init__(self, main_window: 'MainWindow', parent: ttk.Frame):
         self.dla_image = main_window.dla_image
 
-        frame = ttk.Frame(main_window.root, relief='groove', borderwidth=3)
+        frame = ttk.Frame(parent, relief='groove', borderwidth=3)
 
         self.size_label = ttk.Label(frame, font=('Arial', 15), text=self._size_label_build_text())
         self.size_label.pack()
