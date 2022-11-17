@@ -2,20 +2,19 @@ import tkinter as tk
 from tkinter import ttk
 from typing import TYPE_CHECKING
 
-import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from gui.utils import show_askyesno
+from .utils import show_askyesno
 
 if TYPE_CHECKING:
-    from gui.main_window import MainWindow
+    from .main_window import MainWindow
 
 
 class SimulationFrame:
-    EMPTY_COLOR = 'black'
-    GRID_COLOR = 'white'
-    PARTICLE_COLOR = 'gray'
+    # EMPTY_COLOR = 'black'
+    # GRID_COLOR = 'white'
+    # PARTICLE_COLOR = 'gray'
 
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
@@ -30,9 +29,6 @@ class SimulationFrame:
 
         self.plot = self.fig.add_subplot(111)
         self._draw_plot()
-
-        # self.fig.gca().set_xticks([])
-        # self.fig.gca().set_yticks([])
         self.fig.tight_layout()
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=frame)
@@ -68,39 +64,35 @@ class SimulationFrame:
 
         frame.pack(side='right', expand=True, fill='both')
 
-    def next_turn_update(self, refresh_complex=True):
+    def refresh(self, refresh_complex=True):
         if refresh_complex:
             self.plot.clear()
             self._draw_plot()
-
-            # self.fig.gca().set_xticks([])
-            # self.fig.gca().set_yticks([])
-
             self.canvas.draw()
 
-    def refresh(self):
-        self.next_turn_update()
-
     def _draw_plot(self):
-        # self.plot.pcolor(self.dla_image.generate_image())
-        margin = 0.12
-        subplot_fraction = 1 - 2 * margin
-        self.fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
-        array = np.array(list(self.dla_image.grid)).astype(np.float32)
-        array += 0.5
-        marker_size = (subplot_fraction * self.fig.get_size_inches()[0] * 72 / self.dla_image.image_size) ** 2
-        self.plot.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-        array = np.array(list(self.dla_image.particles)).astype(np.float32)
-        array += 0.5
-        self.plot.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-        self.plot.set_xlim(0, self.dla_image.image_size)
-        self.plot.set_ylim(0, self.dla_image.image_size)
-        ax = self.fig.gca()
-        ax.set_aspect('equal')
-        ax.set_xticks(np.arange(0, self.dla_image.image_size, 1))
-        ax.set_yticks(np.arange(0, self.dla_image.image_size, 1))
-        self.plot.grid()
-        # self.plot.show()
+        self.plot.pcolor(self.dla_image.generate_image())
+        self.fig.gca().set_aspect('equal')
+        self.fig.gca().set_xticks([])
+        self.fig.gca().set_yticks([])
+
+        # margin = 0.12
+        # subplot_fraction = 1 - 2 * margin
+        # self.fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
+        # array = np.array(list(self.dla_image.grid)).astype(np.float32)
+        # array += 0.5
+        # marker_size = (subplot_fraction * self.fig.get_size_inches()[0] * 72 / self.dla_image.image_size) ** 2
+        # self.plot.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
+        # array = np.array(list(self.dla_image.particles)).astype(np.float32)
+        # array += 0.5
+        # self.plot.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
+        # self.plot.set_xlim(0, self.dla_image.image_size)
+        # self.plot.set_ylim(0, self.dla_image.image_size)
+        # ax = self.fig.gca()
+        # ax.set_aspect('equal')
+        # ax.set_xticks(np.arange(0, self.dla_image.image_size, 1))
+        # ax.set_yticks(np.arange(0, self.dla_image.image_size, 1))
+        # self.plot.grid()
 
     def _button_start_command(self):
         self.simulation_timer.start_timer()

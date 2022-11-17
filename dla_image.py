@@ -3,8 +3,8 @@ import random
 import numpy as np
 from matplotlib import pyplot as plt
 
-class DLAImage:
 
+class DLAImage:
     def __init__(self, image_size, n_particles, init_method='middle'):
         self.image_size = image_size
         self.n_particles = n_particles
@@ -18,18 +18,20 @@ class DLAImage:
 
     def init(self):
         self.grid = set()
-        self.grid_len = 0
         if self.init_method == 'middle':
             self.initialize_middle()
         else:
             raise ValueError(f'Init method {self.init_method} does not exist')
 
+        self.grid_len = len(self.grid)
         self.particles = np.array([self._random_position()])
 
     def initialize_middle(self):
         self.grid.add((self.image_size // 2, self.image_size // 2))
 
     def simulation_step(self):
+        if self.grid_len >= self.n_particles:
+            self.particles = np.array([])
         for i, particle in enumerate(self.particles):
             move = self._random_move()
 
@@ -75,12 +77,12 @@ class DLAImage:
         subplot_fraction = 1 - 2 * margin
         fig = plt.figure(figsize=(3, 3))
         fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
-        array=np.array(list(self.grid)).astype(np.float32)
-        array+=0.5
-        marker_size = (subplot_fraction*3 * 72 / self.image_size) ** 2
-        plt.scatter(array[:,0],array[:,1],marker="s",s=marker_size)
+        array = np.array(list(self.grid)).astype(np.float32)
+        array += 0.5
+        marker_size = (subplot_fraction * 3 * 72 / self.image_size) ** 2
+        plt.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
         array = np.array(list(self.particles)).astype(np.float32)
-        array+=0.5
+        array += 0.5
         plt.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
         plt.xlim(0, self.image_size)
         plt.ylim(0, self.image_size)
@@ -90,6 +92,13 @@ class DLAImage:
         ax.set_yticks(np.arange(0, self.image_size, 1))
         plt.grid()
         plt.show()
+
+    def get_n_grid(self):
+        return self.grid_len
+
+    def get_target_size(self):
+        return self.n_particles
+
 
 if __name__ == '__main__':
     image = DLAImage(10, 10)
