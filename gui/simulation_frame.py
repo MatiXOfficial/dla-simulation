@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from .utils import show_askyesno
+from config import RefreshType
 
 if TYPE_CHECKING:
     from .main_window import MainWindow
@@ -18,6 +18,7 @@ class SimulationFrame:
 
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
+        self.config = main_window.config
         self.root = main_window.root
         self.simulation_timer = main_window.simulation_timer
         self.dla_image = main_window.dla_image
@@ -68,7 +69,7 @@ class SimulationFrame:
             self.canvas.draw()
 
     def _draw_plot(self):
-        self.plot.pcolor(self.dla_image.generate_image())
+        self.plot.pcolor(self.dla_image.generate_image(show_particles=self.config.refresh == RefreshType.EVERY_TURN))
         self.fig.gca().set_aspect('equal')
         self.fig.gca().set_xticks([])
         self.fig.gca().set_yticks([])

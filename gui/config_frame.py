@@ -26,7 +26,7 @@ class ConfigFrame:
         self.refresh_var = tk.Variable(value=self.config.refresh.value)
         for refresh_type in RefreshType:
             ttk.Radiobutton(refresh_frame, variable=self.refresh_var, text=str(refresh_type.value),
-                            value=refresh_type.value).pack(anchor='w', side='left')
+                            value=refresh_type.value).pack(anchor='w', side='top')
         self._add_settings_row('Refresh:', refresh_frame)
 
         # Init mode
@@ -34,7 +34,7 @@ class ConfigFrame:
         self.init_mode_var = tk.StringVar(value=self.config.init_type.value)
         for init_type in InitType:
             ttk.Radiobutton(init_mode_frame, variable=self.init_mode_var, text=str(init_type.value),
-                            value=init_type.value).pack(anchor='w', side='left')
+                            value=init_type.value).pack(anchor='w', side='top')
         self._add_settings_row('Init mode:', init_mode_frame)
 
         # Canvas size
@@ -58,8 +58,8 @@ class ConfigFrame:
         button_reset = ttk.Button(control_frame, text='Reset settings', command=self._button_reset_command)
         button_reset.pack(side='left', padx=2, pady=2)
 
-        # Reinit button
-        button_reinit = ttk.Button(control_frame, text='Reinit simulation', command=self._button_reinit_command)
+        # Init button
+        button_reinit = ttk.Button(control_frame, text='Init simulation', command=self._button_reinit_command)
         button_reinit.pack(side='left', padx=2, pady=2)
 
         control_frame.pack(side='bottom', padx=2, pady=2)
@@ -72,7 +72,7 @@ class ConfigFrame:
     def _add_settings_row(self, label_text: str, option: ttk.Widget):
         label = ttk.Label(self.settings_frame, text=label_text)
 
-        label.grid(row=self.settings_row, column=0, sticky='w', padx=10, pady=2)
+        label.grid(row=self.settings_row, column=0, sticky='w', padx=10, pady=5)
         option.grid(row=self.settings_row, column=1, sticky='w')
 
         self.settings_row += 1
@@ -80,12 +80,12 @@ class ConfigFrame:
     def _button_reinit_command(self):
         was_running = self.simulation_timer.is_running()
         self.simulation_timer.stop_timer()
-        if show_askyesno('Reset', 'Are you sure want to abandon the current simulation?'):
-            self._config_update()
-            self.main_window.reinit()
-        else:
-            if was_running:
-                self.simulation_timer.start_timer()
+        # if show_askyesno('Reset', 'Are you sure want to abandon the current simulation?'):
+        self._config_update()
+        self.main_window.reinit()
+        # else:
+        #     if was_running:
+        #         self.simulation_timer.start_timer()
 
     def _button_reset_command(self):
         self._config_reset()

@@ -2,8 +2,9 @@ from enum import Enum
 
 
 class RefreshType(Enum):
-    EVERY_PARTICLE = "every particle"
     EVERY_TURN = "every turn"
+    EVERY_PARTICLE = "every particle"
+    PERIODICALLY = 'periodically'
 
 
 class InitType(Enum):

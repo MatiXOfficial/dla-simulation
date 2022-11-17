@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from config import Config
+from config import Config, RefreshType
 from dla_image import DLAImage
 from .information_frame import InformationFrame
 from .simulation_frame import SimulationFrame
@@ -44,5 +44,12 @@ class MainWindow:
         self.information_frame.refresh()
 
     def next_turn(self):
-        self.dla_image.simulation_step()
+        if self.config.refresh == RefreshType.PERIODICALLY:
+            self.dla_image.simulate_periodically()
+        elif self.config.refresh == RefreshType.EVERY_PARTICLE:
+            self.dla_image.simulate_until_growth()
+        elif self.config.refresh == RefreshType.EVERY_TURN:
+            self.dla_image.simulate_step()
+        else:
+            raise ValueError(f'Wrong refresh type: {self.config.refresh}')
         self.refresh()

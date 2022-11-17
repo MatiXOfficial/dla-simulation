@@ -1,4 +1,5 @@
 import random
+import time
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -7,6 +8,7 @@ from config import Config, InitType
 
 
 class DLAImage:
+    PERIOD = 10
     def __init__(self, config: Config):
         self.config = config
 
@@ -27,9 +29,8 @@ class DLAImage:
     def initialize_middle(self):
         self.grid.add((self.config.canvas_size // 2, self.config.canvas_size // 2))
 
-    def simulation_step(self):
-        if self.grid_len >= self.config.image_target_size:
-            self.particles = np.array([])
+    def simulate_step(self):
+        growth = False
         for i, particle in enumerate(self.particles):
             move = self._random_move()
 
@@ -39,20 +40,39 @@ class DLAImage:
                 self.grid.add(tuple(particle))
                 self.particles[i] = self._random_position()
                 self.grid_len += 1
+                growth = True
                 continue
 
             if self._is_valid_pos(new_position):
                 self.particles[i] = new_position
 
+        if self.grid_len >= self.config.image_target_size:
+            self.particles = np.array([])
+        return growth
+
+    def simulate_until_growth(self):
+        while not self.simulate_step():  # break loop when growth
+            pass
+
+    def simulate_periodically(self):
+        start = time.time()
+        while self.grid_len < self.config.image_target_size and time.time() - start < self.PERIOD:
+            self.simulate_until_growth()
+
+        if self.grid_len >= self.config.image_target_size:
+            self.particles = np.array([])
+
     def simulate(self):
         while self.grid_len < self.config.image_target_size:
-            self.simulation_step()
+            self.simulate_step()
+        self.particles = np.array([])
 
-    def generate_image(self):
+    def generate_image(self, show_particles=False):
         image = np.zeros((self.config.canvas_size, self.config.canvas_size))
+        if show_particles:
+            for x, y in self.particles:
+                image[x][y] = 2
         for x, y in self.grid:
-            image[x][y] = 2
-        for x, y in self.particles:
             image[x][y] = 1
         return image
 
