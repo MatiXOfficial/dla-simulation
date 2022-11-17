@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from typing import TYPE_CHECKING
 
+from config import RefreshType, InitType
 from .utils import show_askyesno
 
 if TYPE_CHECKING:
@@ -21,10 +22,20 @@ class ConfigFrame:
         self.settings_row = 0
 
         # Refresh
-        self._add_settings_row('Refresh:')
+        refresh_frame = ttk.Frame(self.settings_frame)
+        self.refresh_var = tk.Variable(value=self.config.refresh.value)
+        for refresh_type in RefreshType:
+            ttk.Radiobutton(refresh_frame, variable=self.refresh_var, text=str(refresh_type.value),
+                            value=refresh_type.value).pack(anchor='w', side='left')
+        self._add_settings_row('Refresh:', refresh_frame)
 
         # Init mode
-        self._add_settings_row('Init mode:')
+        init_mode_frame = ttk.Frame(self.settings_frame)
+        self.init_mode_var = tk.StringVar(value=self.config.init_type.value)
+        for init_type in InitType:
+            ttk.Radiobutton(init_mode_frame, variable=self.init_mode_var, text=str(init_type.value),
+                            value=init_type.value).pack(anchor='w', side='left')
+        self._add_settings_row('Init mode:', init_mode_frame)
 
         # Canvas size
         self.canvas_var = tk.IntVar(value=self.config.canvas_size)
@@ -58,12 +69,11 @@ class ConfigFrame:
     def refresh(self):
         pass
 
-    def _add_settings_row(self, label_text: str, option: ttk.Entry = None):
+    def _add_settings_row(self, label_text: str, option: ttk.Widget):
         label = ttk.Label(self.settings_frame, text=label_text)
 
         label.grid(row=self.settings_row, column=0, sticky='w', padx=10, pady=2)
-        if option is not None:
-            option.grid(row=self.settings_row, column=1)
+        option.grid(row=self.settings_row, column=1, sticky='w')
 
         self.settings_row += 1
 
@@ -81,9 +91,13 @@ class ConfigFrame:
         self._config_reset()
 
     def _config_reset(self):
+        self.refresh_var.set(self.config.refresh.value)
+        self.init_mode_var.set(self.config.init_type.value)
         self.canvas_var.set(self.config.canvas_size)
         self.image_size_var.set(self.config.image_target_size)
 
     def _config_update(self):
+        self.config.refresh = RefreshType(self.refresh_var.get())
+        self.config.init_type = InitType(self.init_mode_var.get())
         self.config.canvas_size = self.canvas_var.get()
         self.config.image_target_size = self.image_size_var.get()

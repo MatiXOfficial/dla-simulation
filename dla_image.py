@@ -18,6 +18,8 @@ class DLAImage:
         self.grid = set()
         if self.config.init_type == InitType.MIDDLE:
             self.initialize_middle()
+        else:
+            raise ValueError(f'Wrong init type: {self.config.init_type}')
 
         self.grid_len = len(self.grid)
         self.particles = np.array([self._random_position()])

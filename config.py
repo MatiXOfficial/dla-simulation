@@ -2,13 +2,12 @@ from enum import Enum
 
 
 class RefreshType(Enum):
-    ONLY_AT_THE_END = 1
-    EVERY_PARTICLE = 2
-    EVERY_TURN = 3
+    EVERY_PARTICLE = "every particle"
+    EVERY_TURN = "every turn"
 
 
 class InitType(Enum):
-    MIDDLE = 1
+    MIDDLE = "middle"
 
 
 class Config:
