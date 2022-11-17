@@ -53,9 +53,6 @@ class SimulationFrame:
         button_next_turn = ttk.Button(options_frame, text='Next turn', command=self._button_next_turn_command)
         button_next_turn.pack(side='left')
 
-        button_reset = ttk.Button(options_frame, text='Reset', command=self._button_reset_command)
-        button_reset.pack(side='left')
-
         self.button_refresh = tk.Button(options_frame, text='Refresh', command=self._button_refresh_command, bd=1,
                                         relief=tk.GROOVE, width=6, fg='white', bg='#007aff')
         self.button_refresh.pack(side='left')
@@ -106,16 +103,6 @@ class SimulationFrame:
 
     def _button_next_turn_command(self):
         self.simulation_timer.trigger_action()
-
-    def _button_reset_command(self):
-        was_running = self.simulation_timer.is_running()
-        self.simulation_timer.stop_timer()
-        if show_askyesno('Reset', 'Are you sure want to abandon the current simulation and reset the settings?'):
-            self.simulation_timer.kill()
-            self.main_window.reinit()
-        else:
-            if was_running:
-                self.simulation_timer.start_timer()
 
     def _button_refresh_command(self):
         self.main_window.refresh_complex = not self.main_window.refresh_complex

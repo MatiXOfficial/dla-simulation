@@ -14,7 +14,7 @@ class StatisticsFrame:
         self.size_label = ttk.Label(frame, font=('Arial', 15), text=self._size_label_build_text())
         self.size_label.pack()
 
-        frame.pack(side='top', expand=True, fill='x')
+        frame.pack(side='top', expand=False, fill='both')
 
     def refresh(self):
         self.size_label.config(text=self._size_label_build_text())
