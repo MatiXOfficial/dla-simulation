@@ -3,7 +3,6 @@ from tkinter import ttk
 from typing import TYPE_CHECKING
 
 from config import RefreshType, InitType
-from .utils import show_askyesno
 
 if TYPE_CHECKING:
     from .main_window import MainWindow
@@ -13,7 +12,7 @@ class ConfigFrame:
     def __init__(self, main_window: 'MainWindow', parent: ttk.Frame):
         self.main_window = main_window
         self.config = main_window.config
-        self.simulation_timer = main_window.simulation_timer
+        self.simulation_handler = self.main_window.simulation_handler
 
         frame = ttk.Frame(parent, relief='groove', borderwidth=3)
 
@@ -78,8 +77,7 @@ class ConfigFrame:
         self.settings_row += 1
 
     def _button_reinit_command(self):
-        was_running = self.simulation_timer.is_running()
-        self.simulation_timer.stop_timer()
+        self.simulation_handler.stop()
         # if show_askyesno('Reset', 'Are you sure want to abandon the current simulation?'):
         self._config_update()
         self.main_window.reinit()

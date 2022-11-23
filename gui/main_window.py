@@ -1,26 +1,22 @@
 import tkinter as tk
 
-from config import Config, RefreshType
-from dla_image import DLAImage
+from config import Config
 from .information_frame import InformationFrame
 from .simulation_frame import SimulationFrame
-from .utils import SimulationTimer
+from .simulation_handler import SimulationHandler
 
 
 class MainWindow:
-    def __init__(self, dla_image: DLAImage, config: Config):
-        self.dla_image = dla_image
-        self.dla_image.init()
-
+    def __init__(self, config: Config):
         self.config = config
+
+        self.simulation_handler = SimulationHandler(self)
 
         self.root = tk.Tk()
         self.root.title('DLA Simulation')
         self.root.protocol('WM_DELETE_WINDOW', exit)
 
         self.refresh_complex = True
-        self.simulation_timer = SimulationTimer(self.next_turn)
-        self.simulation_timer.start()
 
         self.simulation_frame = SimulationFrame(self)
         self.information_frame = InformationFrame(self)
@@ -30,8 +26,7 @@ class MainWindow:
         self.start_loop()
 
     def reinit(self):
-        self.dla_image.init()
-        self.simulation_timer = SimulationTimer(self.next_turn)
+        self.simulation_handler.reinit()
         self.refresh()
 
     def start_loop(self):
@@ -42,14 +37,3 @@ class MainWindow:
             refresh_complex = self.refresh_complex
         self.simulation_frame.refresh(refresh_complex)
         self.information_frame.refresh()
-
-    def next_turn(self):
-        if self.config.refresh == RefreshType.PERIODICALLY:
-            self.dla_image.simulate_periodically()
-        elif self.config.refresh == RefreshType.EVERY_PARTICLE:
-            self.dla_image.simulate_until_growth()
-        elif self.config.refresh == RefreshType.EVERY_TURN:
-            self.dla_image.simulate_step()
-        else:
-            raise ValueError(f'Wrong refresh type: {self.config.refresh}')
-        self.refresh()

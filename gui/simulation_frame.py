@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
-from config import RefreshType
-
 if TYPE_CHECKING:
     from .main_window import MainWindow
 
@@ -19,19 +17,17 @@ class SimulationFrame:
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
         self.config = main_window.config
+        self.simulation_handler = main_window.simulation_handler
         self.root = main_window.root
-        self.simulation_timer = main_window.simulation_timer
-        self.dla_image = main_window.dla_image
 
         frame = ttk.Frame(self.root)
 
         # map
         self.fig = Figure(figsize=(5, 5))
 
-        self.plot = self.fig.add_subplot(111)
+        self.ax = self.fig.add_subplot()
         self._draw_plot()
         self.fig.tight_layout()
-
         self.canvas = FigureCanvasTkAgg(self.fig, master=frame)
         self.canvas.draw()
 
@@ -46,11 +42,6 @@ class SimulationFrame:
         button_stop = ttk.Button(options_frame, text='Stop', command=self._button_stop_command)
         button_stop.pack(side='left')
 
-        self.var_simulation_speed = tk.IntVar(value=3)
-        scale_simulation_speed = ttk.Scale(options_frame, orient='horizontal', from_=1, to=18,
-                                           variable=self.var_simulation_speed, command=self._update_simulation_speed)
-        scale_simulation_speed.pack(side='left')
-
         button_next_turn = ttk.Button(options_frame, text='Next turn', command=self._button_next_turn_command)
         button_next_turn.pack(side='left')
 
@@ -64,46 +55,44 @@ class SimulationFrame:
 
     def refresh(self, refresh_complex=True):
         if refresh_complex:
-            self.plot.clear()
+            self.ax.clear()
             self._draw_plot()
             self.canvas.draw()
 
     def _draw_plot(self):
-        self.plot.pcolor(self.dla_image.generate_image(show_particles=self.config.refresh == RefreshType.EVERY_TURN))
-        self.fig.gca().set_aspect('equal')
+        self.ax.imshow(self.simulation_handler.image, origin='lower')
         self.fig.gca().set_xticks([])
         self.fig.gca().set_yticks([])
 
-        # margin = 0.12
-        # subplot_fraction = 1 - 2 * margin
-        # self.fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
-        # array = np.array(list(self.dla_image.grid)).astype(np.float32)
-        # array += 0.5
-        # marker_size = (subplot_fraction * self.fig.get_size_inches()[0] * 72 / self.dla_image.image_size) ** 2
-        # self.plot.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-        # array = np.array(list(self.dla_image.particles)).astype(np.float32)
-        # array += 0.5
-        # self.plot.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-        # self.plot.set_xlim(0, self.dla_image.image_size)
-        # self.plot.set_ylim(0, self.dla_image.image_size)
-        # ax = self.fig.gca()
-        # ax.set_aspect('equal')
-        # ax.set_xticks(np.arange(0, self.dla_image.image_size, 1))
-        # ax.set_yticks(np.arange(0, self.dla_image.image_size, 1))
-        # self.plot.grid()
+    # margin = 0.12
+    # subplot_fraction = 1 - 2 * margin
+    # self.fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
+    # array = np.array(list(self.dla_image.grid)).astype(np.float32)
+    # array += 0.5
+    # marker_size = (subplot_fraction * self.fig.get_size_inches()[0] * 72 / self.dla_image.image_size) ** 2
+    # self.ax.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
+    # array = np.array(list(self.dla_image.particles)).astype(np.float32)
+    # array += 0.5
+    # self.ax.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
+    # self.ax.set_xlim(0, self.dla_image.image_size)
+    # self.ax.set_ylim(0, self.dla_image.image_size)
+    # ax = self.fig.gca()
+    # ax.set_aspect('equal')
+    # ax.set_xticks(np.arange(0, self.dla_image.image_size, 1))
+    # ax.set_yticks(np.arange(0, self.dla_image.image_size, 1))
+    # self.ax.grid()
+
+    def _update_plot(self):
+        self.im.set_data(self.simulation_handler.image)
 
     def _button_start_command(self):
-        self.simulation_timer.start_timer()
+        self.simulation_handler.start()
 
     def _button_stop_command(self):
-        self.simulation_timer.stop_timer()
-
-    def _update_simulation_speed(self, value):
-        timeout = 2 ** -self.var_simulation_speed.get()
-        self.simulation_timer.update_timeout(timeout)
+        self.simulation_handler.stop()
 
     def _button_next_turn_command(self):
-        self.simulation_timer.trigger_action()
+        self.simulation_handler.next_turn()
 
     def _button_refresh_command(self):
         self.main_window.refresh_complex = not self.main_window.refresh_complex

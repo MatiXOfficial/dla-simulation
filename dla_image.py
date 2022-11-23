@@ -1,5 +1,4 @@
 import random
-import time
 
 import numpy as np
 from matplotlib import pyplot as plt
@@ -9,28 +8,24 @@ from config import Config, InitType
 
 class DLAImage:
     PERIOD = 10
+
     def __init__(self, config: Config):
         self.config = config
 
-        self.grid: set = None
-        self.grid_len: int = None
-        self.particles: np.ndarray = None
-
-    def init(self):
         self.grid = set()
-        if self.config.init_type == InitType.MIDDLE:
-            self.initialize_middle()
-        else:
-            raise ValueError(f'Wrong init type: {self.config.init_type}')
+        self.initialize_grid()
 
         self.grid_len = len(self.grid)
         self.particles = np.array([self._random_position()])
 
-    def initialize_middle(self):
-        self.grid.add((self.config.canvas_size // 2, self.config.canvas_size // 2))
+    def initialize_grid(self):
+        if self.config.init_type == InitType.MIDDLE:
+            self.grid.add((self.config.canvas_size // 2, self.config.canvas_size // 2))
+        else:
+            raise ValueError(f'Wrong init type: {self.config.init_type}')
 
     def simulate_step(self):
-        growth = False
+        growth = []
         for i, particle in enumerate(self.particles):
             move = self._random_move()
 
@@ -38,29 +33,20 @@ class DLAImage:
 
             if tuple(new_position) in self.grid:
                 self.grid.add(tuple(particle))
+                growth.append(tuple(particle))
                 self.particles[i] = self._random_position()
                 self.grid_len += 1
-                growth = True
                 continue
 
             if self._is_valid_pos(new_position):
                 self.particles[i] = new_position
 
-        if self.grid_len >= self.config.image_target_size:
-            self.particles = np.array([])
         return growth
 
     def simulate_until_growth(self):
-        while not self.simulate_step():  # break loop when growth
-            pass
-
-    def simulate_periodically(self):
-        start = time.time()
-        while self.grid_len < self.config.image_target_size and time.time() - start < self.PERIOD:
-            self.simulate_until_growth()
-
-        if self.grid_len >= self.config.image_target_size:
-            self.particles = np.array([])
+        while True:
+            if growth := self.simulate_step():
+                return growth
 
     def simulate(self):
         while self.grid_len < self.config.image_target_size:
@@ -124,7 +110,6 @@ if __name__ == '__main__':
     config.image_target_size = 10
 
     image = DLAImage(config)
-    image.init()
 
     image.simulate()
 

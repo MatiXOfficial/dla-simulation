@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
 class StatisticsFrame:
     def __init__(self, main_window: 'MainWindow', parent: ttk.Frame):
-        self.dla_image = main_window.dla_image
+        self.config = main_window.config
+        self.simulation_handler = main_window.simulation_handler
 
         frame = ttk.Frame(parent, relief='groove', borderwidth=3)
 
@@ -20,4 +21,4 @@ class StatisticsFrame:
         self.size_label.config(text=self._size_label_build_text())
 
     def _size_label_build_text(self):
-        return f'Image size: {self.dla_image.get_n_grid()} / {self.dla_image.get_target_size()}'
+        return f'Image size: {self.simulation_handler.grid_len} / {self.config.image_target_size}'
