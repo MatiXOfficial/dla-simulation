@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from config import RefreshType
 from dla_scheduler import DLAScheduler
 
 if TYPE_CHECKING:
@@ -13,6 +14,8 @@ if TYPE_CHECKING:
 
 
 class SimulationHandler:
+    PERIOD = 10
+
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
         self.config = main_window.config
@@ -47,22 +50,30 @@ class SimulationHandler:
         self.running_event.clear()
 
     def next_turn(self):
-        if self.queue.empty():  # Trigger the simulation only if the queue is empty
+        # Trigger the simulation only if the queue is empty and simulation is stopped
+        if self.queue.empty() and not self.running_event.is_set():
             self.running_event.set()
             self.running_event.clear()
+        self.main_window.refresh()
 
     def _add_particle(self, x, y):
         self.image[x][y] = 1
         self.grid_len += 1
 
     def _update_image(self):
+        start = time.time()
         while True:
             if self.grid_len < self.config.image_target_size:
                 try:
                     self._add_particle(*self.queue.get(timeout=1))
                 except Empty:
                     pass
-                self.main_window.refresh()
+
+                if self.config.refresh == RefreshType.PERIODICALLY and time.time() < start + SimulationHandler.PERIOD:
+                    self.main_window.refresh(refresh_complex=False)
+                else:
+                    self.main_window.refresh()
+                    start = time.time()
             else:
                 time.sleep(1)
 

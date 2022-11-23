@@ -25,7 +25,7 @@ class ConfigFrame:
         self.refresh_var = tk.Variable(value=self.config.refresh.value)
         for refresh_type in RefreshType:
             ttk.Radiobutton(refresh_frame, variable=self.refresh_var, text=str(refresh_type.value),
-                            value=refresh_type.value).pack(anchor='w', side='top')
+                            value=refresh_type.value, command=self._update_refresh).pack(anchor='w', side='top')
         self._add_settings_row('Refresh:', refresh_frame)
 
         # Init mode
@@ -78,12 +78,8 @@ class ConfigFrame:
 
     def _button_reinit_command(self):
         self.simulation_handler.stop()
-        # if show_askyesno('Reset', 'Are you sure want to abandon the current simulation?'):
         self._config_update()
         self.main_window.reinit()
-        # else:
-        #     if was_running:
-        #         self.simulation_timer.start_timer()
 
     def _button_reset_command(self):
         self._config_reset()
@@ -99,3 +95,6 @@ class ConfigFrame:
         self.config.init_type = InitType(self.init_mode_var.get())
         self.config.canvas_size = self.canvas_var.get()
         self.config.image_target_size = self.image_size_var.get()
+
+    def _update_refresh(self):
+        self.config.refresh = RefreshType(self.refresh_var.get())
