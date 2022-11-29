@@ -55,7 +55,9 @@ class SphereAttractor:
         return weight
 
 class AttractorField:
-    attractorList=[]
+
+    def __init__(self):
+        self.attractorList=[]
 
     def add_attractor(self, attractor):
         self.attractorList.append(attractor)
@@ -85,18 +87,13 @@ class DLAImage:
     def __init__(self, config: Config):
         self.config = config
 
-        self.grid: set = None
-        self.grid_len: int = None
-        self.particles: np.ndarray = None
-        self.attractorField=AttractorField()
-
-    def init(self):
         self.grid = set()
         self.initialize_grid()
 
         self.grid_len = len(self.grid)
+        self.attractorField = AttractorField()
+        self.attractorField.add_attractor(SphereAttractor((5, 5), 5, 10, False))
         self.particles = np.array([self._random_position()])
-        self.attractorField.add_attractor(SphereAttractor((5,5),5,10,False))
 
     def initialize_grid(self):
         if self.config.init_type == InitType.MIDDLE:
