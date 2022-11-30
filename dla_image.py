@@ -12,26 +12,27 @@ def length(p1,p2):
     vec=(abs(p1[0]-p2[0]),abs(p1[1]-p2[1]))
     return math.sqrt(vec[0]*vec[0]+vec[1]*vec[1])
 
-
-class SphereAttractor:
-    def __init__(self,pos,radius,force,negative=False):
+class Attractor:
+    def __init__(self,pos,force,negative=False):
         self.pos=pos
-        self.radius=radius
         self.negative=negative
         self.force=force
 
+    def distance_function(self,pos1,pos2) -> float:
+        pass
+
     def check(self, pos):
-        distance = length(self.pos, pos) - self.radius
-        if distance<0.:
+        distance = self.distance_function(self.pos, pos)
+        if distance<=1.:
             return False
         return True
 
     def get_probability(self,pos):
-        distance=length(self.pos,pos) - self.radius
+        distance=self.distance_function(self.pos, pos)
         weight=[]
         for move in DLAImage.possible_moves:
             current_pos=pos+move
-            current_distance=length(self.pos,current_pos) - self.radius
+            current_distance=self.distance_function(self.pos,current_pos)
             default_probability = 1. / len(DLAImage.possible_moves)
 
             if current_distance<=1.0:
@@ -39,9 +40,9 @@ class SphereAttractor:
                 continue
 
             if self.negative==False:
-                weight.append((distance-current_distance)*(1./current_distance) * self.force+default_probability)
+                weight.append(max(distance-current_distance,0.)*(1./current_distance) * self.force+default_probability)
             else:
-                weight.append((current_distance-distance)*(1./current_distance) * self.force+default_probability)
+                weight.append(max(current_distance-distance,0.)*(1./current_distance) * self.force+default_probability)
 
         weight=np.array(weight)
         min=np.min(weight)
@@ -53,6 +54,27 @@ class SphereAttractor:
         #     weight+=default_probability
 
         return weight
+
+class SphereAttractor(Attractor):
+    def __init__(self,pos,radius,force,negative=False):
+        super().__init__(pos,force,negative)
+        self.radius=radius
+
+    def distance_function(self, pos1, pos2) -> float:
+        return length(pos1,pos2) - self.radius
+
+class RectangleAttractor(Attractor):
+    def __init__(self,pos,a,b,force,negative=False):
+        super().__init__(pos,force,negative)
+        self.a=a
+        self.b=b
+
+    def distance_function(self, pos1, pos2) -> float:
+        p=(pos2[0]-pos1[0],pos2[1]-pos1[1])
+        d = (abs(p[0])-self.a,abs(p[1])-self.b)
+        l=length((0.,0.),(max(d[0], 0.0),max(d[1], 0.0))) + min(max(d[0], 0.0),max(d[1], 0.0))
+        return l
+
 
 class AttractorField:
 
@@ -92,7 +114,8 @@ class DLAImage:
 
         self.grid_len = len(self.grid)
         self.attractorField = AttractorField()
-        self.attractorField.add_attractor(SphereAttractor((5, 5), 5, 10, False))
+        self.attractorField.add_attractor(SphereAttractor((3, 3), 3, 1, False))
+
         self.particles = np.array([self._random_position()])
 
     def initialize_grid(self):
@@ -107,6 +130,7 @@ class DLAImage:
             move = self._random_move(particle)
 
             new_position = particle + move
+            #print(new_position)
 
             if tuple(new_position) in self.grid:
                 self.grid.add(tuple(particle))
