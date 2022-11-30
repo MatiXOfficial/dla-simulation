@@ -114,13 +114,16 @@ class DLAImage:
 
         self.grid_len = len(self.grid)
         self.attractorField = AttractorField()
-        self.attractorField.add_attractor(SphereAttractor((3, 3), 3, 1, False))
+        self.attractorField.add_attractor(SphereAttractor((50, 50), 10, 1, True))
 
         self.particles = np.array([self._random_position()])
 
     def initialize_grid(self):
         if self.config.init_type == InitType.MIDDLE:
             self.grid.add((self.config.canvas_size // 2, self.config.canvas_size // 2))
+        if self.config.init_type == InitType.BOTTOM:
+            for i in range(0,self.config.canvas_size):
+                self.grid.add((0,i))
         else:
             raise ValueError(f'Wrong init type: {self.config.init_type}')
 
