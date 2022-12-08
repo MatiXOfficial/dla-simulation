@@ -20,14 +20,10 @@ class DLAScheduler(Process):
 
     def run(self) -> None:
         # Send init particles
-        for particle in self.dla_image.grid:
-            self.queue.put(particle)
-        self.running_event.set()
-        time.sleep(0.5)
-        self.running_event.clear()
+        self.queue.put(self.dla_image.grid)
 
         # Run the simulation
-        while True:
+        while self.dla_image.grid_len < self.config.image_target_size:
             self.running_event.wait()
             self._handle_turn()
 

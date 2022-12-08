@@ -121,7 +121,7 @@ class DLAImage:
     def initialize_grid(self):
         if self.config.init_type == InitType.MIDDLE:
             self.grid.add((self.config.canvas_size // 2, self.config.canvas_size // 2))
-        if self.config.init_type == InitType.BOTTOM:
+        elif self.config.init_type == InitType.BOTTOM:
             for i in range(0,self.config.canvas_size):
                 self.grid.add((0,i))
         else:

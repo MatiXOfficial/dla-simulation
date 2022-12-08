@@ -70,7 +70,7 @@ class SimulationHandler:
         self.image[x][y] = FieldType.ATTACHED
         self.grid_len += 1
 
-    def _reset_particles(self, particles):
+    def _reset_moving_particles(self, particles):
         for x, y in self.particles:
             if self.image[x][y] != FieldType.ATTACHED:
                 self.image[x][y] = FieldType.EMPTY
@@ -79,36 +79,44 @@ class SimulationHandler:
             for x, y in self.particles:
                 self.image[x][y] = FieldType.PARTICLE
 
+    def _handle_init_particles(self):
+        particles = self.queue.get()
+        for particle in particles:
+            self._attach_particle(*particle)
+
     def _handle_particles(self):
         try:
             particle = self.queue.get(timeout=1)
-            if type(particle) == tuple:  # particle attached to the grid
-                self._attach_particle(*particle)
-            else:  # new positions of not-attached particles
-                self._reset_particles(particle)
+            # attach only if simulation is initialized
+            if self.simulation_initialized:
+                if type(particle) == tuple:  # particle attached to the grid
+                    self._attach_particle(*particle)
+                else:  # new positions of not-attached particles
+                    self._reset_moving_particles(particle)
         except Empty:
             pass
 
     def _update_image(self):
         start = time.time()
         while True:
-            if self.grid_len < self.config.image_target_size:
-                self._handle_particles()
-
-                if not self.simulation_initialized:  # Init particles
-                    self.running_event.wait()
-                    self.main_window.refresh()
-                    self.simulation_initialized = True
-                elif not self.running_event.is_set():
-                    self.main_window.refresh(refresh_complex=False)
-                    time.sleep(0.5)
-                elif self.config.refresh == RefreshType.PERIODICALLY and time.time() < start + SimulationHandler.PERIOD:
-                    self.main_window.refresh(refresh_complex=False)
-                else:
-                    self.main_window.refresh()
-                    start = time.time()
+            if not self.simulation_initialized:  # Init particles
+                self._handle_init_particles()
+                self.main_window.refresh()
+                self.simulation_initialized = True
             else:
-                time.sleep(1)
+                if self.grid_len < self.config.image_target_size:
+                    self._handle_particles()
+                    if not self.running_event.is_set():
+                        self.main_window.refresh(refresh_complex=False)
+                        time.sleep(0.5)
+                    elif self.config.refresh == RefreshType.PERIODICALLY and time.time() < start + \
+                            SimulationHandler.PERIOD:
+                        self.main_window.refresh(refresh_complex=False)
+                    else:
+                        self.main_window.refresh()
+                        start = time.time()
+                else:
+                    time.sleep(1)
 
     def _empty_queue(self):
         while not self.queue.empty():
