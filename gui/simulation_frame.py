@@ -64,27 +64,6 @@ class SimulationFrame:
         self.fig.gca().set_xticks([])
         self.fig.gca().set_yticks([])
 
-    # margin = 0.12
-    # subplot_fraction = 1 - 2 * margin
-    # self.fig.subplots_adjust(margin, margin, 1 - margin, 1 - margin, 0, 0)
-    # array = np.array(list(self.dla_image.grid)).astype(np.float32)
-    # array += 0.5
-    # marker_size = (subplot_fraction * self.fig.get_size_inches()[0] * 72 / self.dla_image.image_size) ** 2
-    # self.ax.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-    # array = np.array(list(self.dla_image.particles)).astype(np.float32)
-    # array += 0.5
-    # self.ax.scatter(array[:, 0], array[:, 1], marker="s", s=marker_size)
-    # self.ax.set_xlim(0, self.dla_image.image_size)
-    # self.ax.set_ylim(0, self.dla_image.image_size)
-    # ax = self.fig.gca()
-    # ax.set_aspect('equal')
-    # ax.set_xticks(np.arange(0, self.dla_image.image_size, 1))
-    # ax.set_yticks(np.arange(0, self.dla_image.image_size, 1))
-    # self.ax.grid()
-
-    def _update_plot(self):
-        self.im.set_data(self.simulation_handler.image)
-
     def _button_start_command(self):
         self.simulation_handler.start()
 

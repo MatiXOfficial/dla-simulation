@@ -72,7 +72,7 @@ class ConfigFrame:
         label = ttk.Label(self.settings_frame, text=label_text)
 
         label.grid(row=self.settings_row, column=0, sticky='w', padx=10, pady=5)
-        option.grid(row=self.settings_row, column=1, sticky='w')
+        option.grid(row=self.settings_row, column=1, sticky='w', pady=5)
 
         self.settings_row += 1
 
