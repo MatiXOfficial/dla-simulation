@@ -9,7 +9,8 @@ class RefreshType(Enum):
 
 class InitType(Enum):
     MIDDLE = "middle"
-    BOTTOM="bottom"
+    BOTTOM = "bottom"
+    CIRCLE = "circle"
 
 
 class Config:
