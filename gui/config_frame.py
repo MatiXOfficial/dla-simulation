@@ -96,5 +96,7 @@ class ConfigFrame:
         self.config.canvas_size = self.canvas_var.get()
         self.config.image_target_size = self.image_size_var.get()
 
+        self.config.reload_attractors()
+
     def _update_refresh(self):
         self.config.refresh = RefreshType(self.refresh_var.get())

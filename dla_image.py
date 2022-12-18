@@ -37,7 +37,7 @@ class Attractor:
 
             if current_distance <= 1.0:
                 weight.append((current_distance - distance) * (
-                            1. / (abs(current_distance) + 0.001)) * 100.0 + default_probability)
+                        1. / (abs(current_distance) + 0.001)) * 100.0 + default_probability)
                 continue
 
             if self.negative == False:
@@ -106,6 +106,28 @@ class AttractorField:
                 return False
         return True
 
+    def build_from_config(self, config: Config):
+        for att_cfg in config.attractors:
+            position = att_cfg['position']
+            position[0] *= config.canvas_size
+            position[1] *= config.canvas_size
+
+            negative = att_cfg['negative'] if 'negative' in att_cfg else True
+            if negative in ['false', 'False', 'FALSE']:
+                negative = False
+
+            force = att_cfg['force']
+
+            if att_cfg['type'] == 'sphere':
+                radius = att_cfg['radius']
+                self.add_attractor(SphereAttractor(position, radius, force, negative))
+            elif att_cfg['type'] == 'rectangle':
+                a = att_cfg['a']
+                b = att_cfg['b']
+                self.add_attractor(RectangleAttractor(position, a, b, force, negative))
+            else:
+                raise ValueError(f"{att_cfg['type']} is not a valid attractor type")
+
 
 class DLAImage:
     possible_moves = [(-1, 0), (-1, 1), (0, 1), (1, 1), (1, 0), (1, -1), (0, -1), (-1, -1)]
@@ -119,7 +141,7 @@ class DLAImage:
 
         self.grid_len = len(self.grid)
         self.attractorField = AttractorField()
-        self.attractorField.add_attractor(SphereAttractor((220, 100), 10, 5, True))
+        self.attractorField.build_from_config(self.config)
 
         self.particles = np.array([self._random_position()])
 
