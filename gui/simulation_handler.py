@@ -108,7 +108,6 @@ class SimulationHandler:
                     self._handle_particles()
                     if not self.running_event.is_set():
                         self.main_window.refresh(refresh_complex=False)
-                        time.sleep(0.5)
                     elif self.config.refresh == RefreshType.PERIODICALLY and time.time() < start + \
                             SimulationHandler.PERIOD:
                         self.main_window.refresh(refresh_complex=False)
