@@ -12,6 +12,7 @@ class InitType(Enum):
     MIDDLE = "middle"
     BOTTOM = "bottom"
     CIRCLE = "circle"
+    EDGES = "edges"
 
 
 class Config:

@@ -153,6 +153,8 @@ class DLAImage:
                 self.grid.add((0, i))
         elif self.config.init_type == InitType.CIRCLE:
             self._init_circle()
+        elif self.config.init_type == InitType.EDGES:
+            self._init_edges()
         else:
             raise ValueError(f'Wrong init type: {self.config.init_type}')
 
@@ -208,6 +210,14 @@ class DLAImage:
 
         for point in points:
             self.grid.add((point[0], point[1]))
+
+    def _init_edges(self):
+        for i in range(0, self.config.canvas_size):
+            self.grid.add((0, i))
+            self.grid.add((self.config.canvas_size - 1, i))
+        for i in range(1, self.config.canvas_size - 1):
+            self.grid.add((i, 0))
+            self.grid.add((i, self.config.canvas_size - 1))
 
     def _random_position(self):
         while True:
