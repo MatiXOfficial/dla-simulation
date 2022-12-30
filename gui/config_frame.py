@@ -48,6 +48,11 @@ class ConfigFrame:
                                          width=5, increment=1)
         self._add_settings_row('Image target size:', image_size_spinbox)
 
+        # Enable attractors
+        self.enable_attractors_var = tk.BooleanVar(value=self.config.enable_attractors)
+        enable_attractors_checkbutton = ttk.Checkbutton(self.settings_frame, variable=self.enable_attractors_var)
+        self._add_settings_row('Enable attractors:', enable_attractors_checkbutton)
+
         self.settings_frame.pack(side='top')
 
         ##### control frame #####
@@ -89,12 +94,14 @@ class ConfigFrame:
         self.init_mode_var.set(self.config.init_type.value)
         self.canvas_var.set(self.config.canvas_size)
         self.image_size_var.set(self.config.image_target_size)
+        self.enable_attractors_var.set(self.config.enable_attractors)
 
     def _config_update(self):
         self.config.refresh = RefreshType(self.refresh_var.get())
         self.config.init_type = InitType(self.init_mode_var.get())
         self.config.canvas_size = self.canvas_var.get()
         self.config.image_target_size = self.image_size_var.get()
+        self.config.enable_attractors = self.enable_attractors_var.get()
 
         self.config.reload_attractors()
 
