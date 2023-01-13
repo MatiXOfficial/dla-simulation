@@ -1,10 +1,13 @@
+import shutil
 import time
 from multiprocessing import Queue, Event
+from pathlib import Path
 from queue import Empty
 from threading import Thread
 from typing import TYPE_CHECKING
 
 import numpy as np
+from matplotlib.figure import Figure
 
 from config import RefreshType
 from dla_scheduler import DLAScheduler
@@ -22,6 +25,8 @@ class FieldType:
 class SimulationHandler:
     PERIOD = 10
     COLOR_MULT = 2
+    TMP_GIF_DIR = './tmp_gif'
+    GIF_SAVE_DIR = './gifs'
 
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
@@ -40,6 +45,15 @@ class SimulationHandler:
         if self.config.coloring:
             self.current_color = self.config.image_target_size * self.COLOR_MULT
 
+        if self.config.produce_gif:
+            try:
+                Path(self.TMP_GIF_DIR).mkdir(exist_ok=False)
+            except FileExistsError:
+                shutil.rmtree(self.TMP_GIF_DIR)
+                Path(self.TMP_GIF_DIR).mkdir(exist_ok=False)
+
+            Path(self.GIF_SAVE_DIR).mkdir(exist_ok=True)
+
         # Keep updating the image on a separate thread
         self.update_thread = Thread(target=self._update_image, daemon=True).start()
 
@@ -57,6 +71,15 @@ class SimulationHandler:
 
         if self.config.coloring:
             self.current_color = self.config.image_target_size * self.COLOR_MULT
+
+        if self.config.produce_gif:
+            try:
+                Path(self.TMP_GIF_DIR).mkdir(exist_ok=False)
+            except FileExistsError:
+                shutil.rmtree(self.TMP_GIF_DIR)
+                Path(self.TMP_GIF_DIR).mkdir(exist_ok=False)
+
+            Path(self.GIF_SAVE_DIR).mkdir(exist_ok=True)
 
         self.dla_scheduler.start()
 
@@ -81,6 +104,9 @@ class SimulationHandler:
             if not freeze_color:
                 self.current_color += 1
         self.grid_len += 1
+        if self.config.produce_gif and not freeze_color:
+            if self.grid_len % self.config.gif_frequency == 0:
+                self._save_gif_image()
 
     def _reset_moving_particles(self, particles):
         for x, y in self.particles:
@@ -134,3 +160,14 @@ class SimulationHandler:
     def _empty_queue(self):
         while not self.queue.empty():
             self.queue.get()
+
+    def _save_gif_image(self):
+        fig = Figure(figsize=(5, 5))
+        ax = fig.add_subplot()
+
+        ax.imshow(self.image, origin='lower')
+        fig.gca().set_xticks([])
+        fig.gca().set_yticks([])
+
+        fig.tight_layout()
+        fig.savefig(f'{self.TMP_GIF_DIR}/{self.grid_len}.jpeg')

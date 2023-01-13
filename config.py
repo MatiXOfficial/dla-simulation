@@ -19,10 +19,13 @@ class Config:
     def __init__(self):
         self.refresh = RefreshType.EVERY_PARTICLE
         self.init_type = InitType.BOTTOM
-        self.canvas_size = 10
-        self.image_target_size = 50
+        self.canvas_size = 100
+        self.image_target_size = 2000
         self.enable_attractors = False
         self.coloring = True
+        self.produce_gif = False
+        self.gif_frequency = 10
+        self.gif_fps = 30
 
         self.attractors: list[dict[str, str]] = []
         self.reload_attractors()

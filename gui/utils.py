@@ -12,6 +12,13 @@ def show_error(error_message):
     exit()
 
 
+def show_message(message):
+    """
+    Show a window with a message.
+    """
+    messagebox.showinfo(message=message)
+
+
 def show_askyesno(title, message):
     """
     Show a window with yes/no quesion.

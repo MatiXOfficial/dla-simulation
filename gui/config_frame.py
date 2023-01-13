@@ -1,8 +1,15 @@
+import os
+import threading
 import tkinter as tk
+from datetime import datetime
 from tkinter import ttk
 from typing import TYPE_CHECKING
 
+import imageio
+
 from config import RefreshType, InitType
+from .simulation_handler import SimulationHandler
+from .utils import show_message, show_error
 
 if TYPE_CHECKING:
     from .main_window import MainWindow
@@ -62,6 +69,25 @@ class ConfigFrame:
 
         self.settings_frame.pack(side='top')
 
+        # Produce GIF
+        self.produce_gif_var = tk.BooleanVar(value=self.config.produce_gif)
+        produce_gif_checkbutton = ttk.Checkbutton(self.settings_frame, variable=self.produce_gif_var)
+        self._add_settings_row('Produce GIF:', produce_gif_checkbutton)
+
+        self.settings_frame.pack(side='top')
+
+        # GIF frequency
+        self.gif_frequency_var = tk.IntVar(value=self.config.gif_frequency)
+        gif_frequency_spinbox = ttk.Spinbox(self.settings_frame, from_=0, to=999999999,
+                                            textvariable=self.gif_frequency_var, width=5, increment=1)
+        self._add_settings_row('GIF frequency:', gif_frequency_spinbox)
+
+        # GIF FPS
+        self.gif_fps_var = tk.IntVar(value=self.config.gif_fps)
+        gif_fps_spinbox = ttk.Spinbox(self.settings_frame, from_=0, to=999999999,
+                                            textvariable=self.gif_fps_var, width=5, increment=1)
+        self._add_settings_row('GIF FPS:', gif_fps_spinbox)
+
         ##### control frame #####
         control_frame = ttk.Frame(frame, relief='ridge', borderwidth=2)
 
@@ -72,6 +98,10 @@ class ConfigFrame:
         # Init button
         button_reinit = ttk.Button(control_frame, text='Init simulation', command=self._button_reinit_command)
         button_reinit.pack(side='left', padx=2, pady=2)
+
+        # Save GIF button
+        button_save_gif = ttk.Button(control_frame, text='Save GIF', command=self._button_save_gif_command)
+        button_save_gif.pack(side='left', padx=2, pady=2)
 
         control_frame.pack(side='bottom', padx=2, pady=2)
 
@@ -96,6 +126,9 @@ class ConfigFrame:
     def _button_reset_command(self):
         self._config_reset()
 
+    def _button_save_gif_command(self):
+        t = threading.Thread(target=self._save_gif, daemon=True).start()
+
     def _config_reset(self):
         self.refresh_var.set(self.config.refresh.value)
         self.init_mode_var.set(self.config.init_type.value)
@@ -103,6 +136,9 @@ class ConfigFrame:
         self.image_size_var.set(self.config.image_target_size)
         self.enable_attractors_var.set(self.config.enable_attractors)
         self.coloring_var.set(self.config.coloring)
+        self.produce_gif_var.set(self.config.produce_gif)
+        self.gif_frequency_var.set(self.config.gif_frequency)
+        self.gif_fps_var.set(self.config.gif_fps)
 
     def _config_update(self):
         self.config.refresh = RefreshType(self.refresh_var.get())
@@ -111,8 +147,22 @@ class ConfigFrame:
         self.config.image_target_size = self.image_size_var.get()
         self.config.enable_attractors = self.enable_attractors_var.get()
         self.config.coloring = self.coloring_var.get()
+        self.config.produce_gif = self.produce_gif_var.get()
+        self.config.gif_frequency = self.gif_frequency_var.get()
+        self.config.gif_fps = self.gif_fps_var.get()
 
         self.config.reload_attractors()
 
     def _update_refresh(self):
         self.config.refresh = RefreshType(self.refresh_var.get())
+
+    def _save_gif(self):
+        try:
+            with imageio.get_writer(f'{SimulationHandler.GIF_SAVE_DIR}/{datetime.now().strftime("%Y_%m_%d_%H_%M_%S")}.gif',
+                                    mode='I', fps=self.config.gif_fps) as writer:
+                for image_name in sorted(os.listdir(SimulationHandler.TMP_GIF_DIR), key=lambda x: int(x[:-5])):
+                    image = imageio.imread(f'{SimulationHandler.TMP_GIF_DIR}/{image_name}')
+                    writer.append_data(image)
+            show_message('GIF saved!')
+        except:
+            show_error('Could not save GIF')
