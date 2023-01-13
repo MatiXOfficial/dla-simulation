@@ -55,6 +55,13 @@ class ConfigFrame:
 
         self.settings_frame.pack(side='top')
 
+        # Coloring
+        self.coloring_var = tk.BooleanVar(value=self.config.coloring)
+        coloring_checkbutton = ttk.Checkbutton(self.settings_frame, variable=self.coloring_var)
+        self._add_settings_row('Coloring:', coloring_checkbutton)
+
+        self.settings_frame.pack(side='top')
+
         ##### control frame #####
         control_frame = ttk.Frame(frame, relief='ridge', borderwidth=2)
 
@@ -95,6 +102,7 @@ class ConfigFrame:
         self.canvas_var.set(self.config.canvas_size)
         self.image_size_var.set(self.config.image_target_size)
         self.enable_attractors_var.set(self.config.enable_attractors)
+        self.coloring_var.set(self.config.coloring)
 
     def _config_update(self):
         self.config.refresh = RefreshType(self.refresh_var.get())
@@ -102,6 +110,7 @@ class ConfigFrame:
         self.config.canvas_size = self.canvas_var.get()
         self.config.image_target_size = self.image_size_var.get()
         self.config.enable_attractors = self.enable_attractors_var.get()
+        self.config.coloring = self.coloring_var.get()
 
         self.config.reload_attractors()
 

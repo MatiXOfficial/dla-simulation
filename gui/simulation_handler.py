@@ -21,6 +21,7 @@ class FieldType:
 
 class SimulationHandler:
     PERIOD = 10
+    COLOR_MULT = 2
 
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
@@ -35,6 +36,9 @@ class SimulationHandler:
         self.dla_scheduler = DLAScheduler(self.config, self.queue, self.running_event)
         self.dla_scheduler.start()
         self.simulation_initialized = False
+
+        if self.config.coloring:
+            self.current_color = self.config.image_target_size * self.COLOR_MULT
 
         # Keep updating the image on a separate thread
         self.update_thread = Thread(target=self._update_image, daemon=True).start()
@@ -51,6 +55,9 @@ class SimulationHandler:
         self.dla_scheduler = DLAScheduler(self.config, self.queue, self.running_event)
         self.simulation_initialized = False
 
+        if self.config.coloring:
+            self.current_color = self.config.image_target_size * self.COLOR_MULT
+
         self.dla_scheduler.start()
 
     def start(self):
@@ -66,8 +73,13 @@ class SimulationHandler:
             self.running_event.clear()
         self.main_window.refresh()
 
-    def _attach_particle(self, x, y):
-        self.image[x][y] = FieldType.ATTACHED
+    def _attach_particle(self, x, y, freeze_color=False):
+        if not self.config.coloring:
+            self.image[x][y] = FieldType.ATTACHED
+        else:
+            self.image[x][y] = self.current_color
+            if not freeze_color:
+                self.current_color += 1
         self.grid_len += 1
 
     def _reset_moving_particles(self, particles):
@@ -82,7 +94,9 @@ class SimulationHandler:
     def _handle_init_particles(self):
         particles = self.queue.get()
         for particle in particles:
-            self._attach_particle(*particle)
+            self._attach_particle(*particle, freeze_color=True)
+        if self.config.coloring:
+            self.current_color += self.grid_len
 
     def _handle_particles(self):
         try:

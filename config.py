@@ -22,6 +22,7 @@ class Config:
         self.canvas_size = 10
         self.image_target_size = 50
         self.enable_attractors = False
+        self.coloring = True
 
         self.attractors: list[dict[str, str]] = []
         self.reload_attractors()
