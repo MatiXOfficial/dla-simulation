@@ -24,10 +24,10 @@ class FieldType:
 
 class SimulationHandler:
     PERIOD = 10
-    COLOR_MULT = 2
+    COLOR_MULT = 1
     TMP_GIF_DIR = './tmp_gif'
     GIF_SAVE_DIR = './gifs'
-    GIF_DPI = 150
+    GIF_DPI = 200
 
     def __init__(self, main_window: 'MainWindow'):
         self.main_window = main_window
@@ -171,4 +171,4 @@ class SimulationHandler:
         fig.gca().set_yticks([])
 
         fig.tight_layout()
-        fig.savefig(f'{self.TMP_GIF_DIR}/{self.grid_len}.jpeg', dpi=self.GIF_DPI)
+        fig.savefig(f'{self.TMP_GIF_DIR}/{self.grid_len}.png', dpi=self.GIF_DPI)
