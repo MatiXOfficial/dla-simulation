@@ -1,7 +1,13 @@
 # Diffusion-Limited Aggregation simulator
 
+## Usage
+```python
+python main.py
+```
+
 ## GUI
-TODO
+<!-- <img src="readme_files/gui.png"> -->
+![](readme_files/gui.png)
 
 ## Examples without attractors
 
@@ -9,13 +15,13 @@ TODO
 <img src="readme_files/middle.png" width="400"> <img src="readme_files/middle.gif" width="400"> 
 
 ### 2. Initialization: bottom, 300x300, 15000 particles
-TODO
+<img src="readme_files/bottom.png" width="400"> <img src="readme_files/bottom.gif" width="400"> 
 
 ### 3. Initialization: circle, 300x300, 15000 particles
-TODO
+<img src="readme_files/circle.png" width="400"> <img src="readme_files/circle.gif" width="400"> 
 
-### 4. Initialization: edges, 300x300, 15000 particles
-TODO
+### 4. Initialization: edges, 300x300, 30000 particles
+<img src="readme_files/edges.png" width="400"> <img src="readme_files/edges.gif" width="400"> 
 
 ## Examples with attractors
 
