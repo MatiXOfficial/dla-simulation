@@ -25,20 +25,14 @@ python main.py
 
 ## Examples with attractors
 
-### 1. Initialization: middle, 300x300, 
-TODO
+### 1. Initialization: middle, 200x200, 7500 particles, circle negative attractor at x:0.5 y:1
+<img src="readme_files/middle_attr.png" width="400" height="400"> <img src="readme_files/middle_atrr.gif" width="400" height="400"> 
 
-### 2. Initialization: bottom, 300x300, 
-TODO
+### 2. Initialization: bottom, 100x100, 2000 particles, 3 circle negative attractors placed in pyramid shape
+<img src="readme_files/bottom_attr.png" width="400" height="400"> <img src="readme_files/bottom_attr.gif" width="400" height="400"> 
 
-### 3. Initialization: circle, 300x300, 
-TODO
+### 3. Initialization: circle, 100x100, 2000 particles, circle positive attractor at x:1 y:1
+<img src="readme_files/circle_attr.png" width="400" height="400"> <img src="readme_files/circle_attr.gif" width="400" height="400"> 
 
-### 4. Initialization: edges, 300x300, 
-TODO
-
-### 5. Other example 1, 300x300, 
-TODO
-
-### 4. Other example 2, 300x300, 
-TODO
+### 4. Initialization: edges, 100x100, 2000 particles, circle positive attractors in 3 corners
+<img src="readme_files/edges_attr.png" width="400" height="400"> <img src="readme_files/edges_attr.gif" width="400"> 
