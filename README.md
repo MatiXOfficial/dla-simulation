@@ -1,5 +1,8 @@
 # Diffusion-Limited Aggregation simulator
 
+## Project report
+[report.pdf](report.pdf)
+
 ## Usage
 ```python
 python main.py
